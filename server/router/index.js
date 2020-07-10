@@ -1,9 +1,10 @@
 var bodyParser = require('body-parser');//解析,用req.body获取post参数
 const express = require('express');
+var expressWs = require('express-ws');
 const jwt = require('jsonwebtoken')
 var vertoken = require('./../token/token_vertify');
 const router = express.Router();
-
+expressWs(router);
 
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/mychat";
@@ -24,7 +25,11 @@ const { secretKey } = require('../token/constant')  //提取Token加密内容 ,�
 
 // router.use(tokens)
 
-
+router.ws('/echo', function(ws, req) {
+  ws.on('message', function(msg) {
+    ws.send(msg);
+  });
+});
 
 
 router.get('/getList', async (req, res) => {

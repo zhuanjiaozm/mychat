@@ -1,15 +1,21 @@
-
-
-
 var express = require('express')
-
 var app = express();
+var expressWs = require('express-ws');
 
+var ws = require('./chat/index')
 //引入post请求解析插件
 
 //node跨域设置
 const cors = require('cors')
 app.use(cors());
+app.all('*', function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  //Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Content-Type', 'application/json;charset=utf-8');
+  next();
+});
 
 // 配置静态目录
 var path = require('path')
@@ -29,6 +35,9 @@ app.use('/public', express.static('public'))
 
 const router = require('./router/index')
 app.use('/auth', router);
+app.use('/ws', ws);
+
+expressWs(app);
 
 //当token失效返回提示信息
 app.use(function (err, req, res, next) {
