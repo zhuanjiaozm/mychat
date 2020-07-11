@@ -1,14 +1,19 @@
 <template>
   <div class="container">
-    <van-search v-model="keyword" background="rgb(79, 192, 141)" shape="round" placeholder="请输入搜索好友信息" />
+    <van-search
+      v-model="keyword"
+      background="rgb(79, 192, 141)"
+      shape="round"
+      placeholder="请输入搜索好友信息"
+    />
 
     <div class="list">
-      <van-swipe-cell v-for="(item, index) in list" :key="index">
-        <div class="li">
+      <van-swipe-cell v-for="item in list" :key="item._id">
+        <div class="li" @click="toChat(item)">
           <div class="avator">
-            <img :src="item.circleUrl">
+            <img :src="item.circleUrl" />
           </div>
-          <div class="center">{{item.name}}</div>
+          <div class="center">{{item.name}}【{{item._id}}】</div>
 
           <div class="right">
             <van-icon name="chat-o" badge="9" />
@@ -19,7 +24,6 @@
         </template>
       </van-swipe-cell>
     </div>
-
   </div>
 </template>
 
@@ -65,36 +69,42 @@
 
 <script>
 export default {
+  name: "list",
   data() {
     return {
-      keyword: '',
+      keyword: "",
       user: {
         age: 11,
-        name: '小',
-        tel: '13277092789',
+        name: "小",
+        tel: "13277092789"
       },
       list: [],
-      addUserResult: '',
+      addUserResult: ""
     };
   },
   methods: {
     addUser() {},
 
+    toChat(user) {
+      this.$router.push({ path: `/chat/${user['_id']}` });
+      sessionStorage.setItem("receiver", JSON.stringify(user));
+    },
+
     getList() {
-      this.$axios.fetch('getList').then((response) => {
+      this.$axios.fetch("getList").then(response => {
         this.list = response;
       });
       this.list = [
         {
-          user: 'name',
-        },
+          user: "name"
+        }
       ];
-    },
+    }
   },
   mounted() {
     this.getList();
 
     // this.addUser();
-  },
+  }
 };
 </script>

@@ -6,19 +6,23 @@
     <ul id="menu">
       <li>
         <router-link to="/list">
-          <van-icon name="friends-o" /> 列表</router-link>
+          <van-icon name="friends-o" />列表
+        </router-link>
       </li>
       <li>
         <router-link to="/chat">
-          <van-icon name="comment-o" /> 对话</router-link>
+          <van-icon name="comment-o" />对话
+        </router-link>
       </li>
       <li>
         <router-link to="/about">
-          <van-icon name="gem-o" /> 发现</router-link>
+          <van-icon name="gem-o" />发现
+        </router-link>
       </li>
       <li>
         <router-link to="/my">
-          <van-icon name="user-circle-o" /> 我的</router-link>
+          <van-icon name="user-circle-o" />我的
+        </router-link>
       </li>
     </ul>
   </div>

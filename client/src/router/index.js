@@ -16,7 +16,7 @@ const routes = [
   // },
   {
     path: '/list',
-    name: 'List',
+    name: 'list',
     component: () => import('../views/List.vue'),
   },
   {
@@ -30,7 +30,7 @@ const routes = [
     component: () => import('../views/Login.vue'),
   },
   {
-    path: '/chat',
+    path: '/chat/:receiverID',
     name: 'chat',
     component: () => import('../views/Chat.vue'),
   },
@@ -48,24 +48,24 @@ const routes = [
 
 const router = new VueRouter({
   mode: 'history',
-  scrollBehavior: () => ({ y: 0 }),
+  // scrollBehavior: () => ({ y: 0 }),
   base: process.env.BASE_URL,
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const hasToken = Boolean(store.state.token);
-  NProgress.start();
-  if (hasToken) {
-    next();
-    NProgress.done();
-  } else if ((to.path === '/addUser') || (to.path === '/login')) {
-    next();
-    NProgress.done();
-  } else {
-    next({ path: '/login' });
-    NProgress.done();
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   const hasToken = Boolean(store.state.token);
+//   NProgress.start();
+//   if (hasToken) {
+//     next();
+//     NProgress.done();
+//   } else if ((to.path === '/addUser') || (to.path === '/login')) {
+//     next();
+//     NProgress.done();
+//   } else {
+//     next({ path: '/login' });
+//     NProgress.done();
+//   }
+// });
 
 export default router;

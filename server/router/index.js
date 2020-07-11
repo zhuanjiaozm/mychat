@@ -23,15 +23,6 @@ const { secretKey } = require('../token/constant')  //提取Token加密内容 ,�
 
 
 
-// router.use(tokens)
-
-router.ws('/echo', function(ws, req) {
-  ws.on('message', function(msg) {
-    ws.send(msg);
-  });
-});
-
-
 router.get('/getList', async (req, res) => {
   let userList = []
   try {
@@ -64,16 +55,14 @@ router.post('/login', jsonParser, async (req, res) => {
   } catch (e) {
     console.log(e.stack);
   } finally {
-
     if (userList) {
-
       let token = await vertoken.setToken(userList[0]['name'], userList[0]['_id'])
       res.cookie('token', token, { httpOnly: true });
       res.json({
         code: 0,
         msg: '登录成功',
         token: token,
-        data: userList,
+        data: userList[0],
         success: userList.length ? true : false
       })
     }

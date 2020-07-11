@@ -1,7 +1,7 @@
 <template>
   <ul class="form">
     <li style="text-align:center">
-      <img :src="circleUrl" class="avatar">
+      <img :src="circleUrl" class="avatar" />
     </li>
 
     <li>
@@ -19,7 +19,6 @@
       <van-button type="primary" round @click="login" :loading="loading" :disabled="loading">
         <van-icon name="success" />登录
       </van-button>
-
     </li>
   </ul>
 </template>
@@ -27,29 +26,30 @@
 export default {
   data() {
     return {
-      circleUrl: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+      circleUrl:
+        "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
       loading: false,
       user: {
-        password: '',
-        tel: this.$route.query.tel || '',
-      },
+        password: "",
+        tel: this.$route.query.tel || ""
+      }
     };
   },
   methods: {
     toReg() {
-      this.$router.push({ path: '/addUser', query: { tel: this.user.tel } });
+      this.$router.push({ path: "/addUser", query: { tel: this.user.tel } });
     },
     checkUserInfo() {
       let hasError;
       if (!this.user.tel) {
         hasError = true;
         this.$dialog.alert({
-          message: '请填写电话',
+          message: "请填写电话"
         });
       } else if (!this.user.password) {
         hasError = true;
         this.$dialog.alert({
-          message: '请填写密码',
+          message: "请填写密码"
         });
       } else {
         hasError = false;
@@ -60,25 +60,23 @@ export default {
     login() {
       if (!this.checkUserInfo()) {
         this.loading = true;
-        this.$axios.post('login', this.user).then((response) => {
+        this.$axios.post("login", this.user).then(response => {
           if (response.success) {
-            this.$notify({ type: 'success', message: '登录成功' });
-            this.$store.commit('setToken', response.token);
-            setTimeout(() => {
-              this.$router.push({ path: '/list' });
-            }, 500);
+            this.$notify({ type: "success", message: "登录成功" });
+            this.$store.commit("setToken", response.token);
+            this.$store.commit("setUser", response.data);
+            this.$router.push({ path: "/list" });
           } else {
-            this.$notify({ type: 'danger', message: '手机号码和密码不匹配' });
+            this.$notify({ type: "danger", message: "手机号码和密码不匹配" });
           }
           this.loading = false;
         });
       }
-    },
+    }
   },
   mounted() {
-
     // this.addUser();
-  },
+  }
 };
 </script>
 

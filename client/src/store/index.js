@@ -5,8 +5,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    user: {},
-    token: JSON.parse(sessionStorage.getItem('token')) || '',
+    user: JSON.parse(sessionStorage.getItem('user')) || {},
+    token: sessionStorage.getItem('token') || '',
   },
   mutations: {
     setToken(state, token) {
@@ -17,6 +17,10 @@ export default new Vuex.Store({
       state.token = '';
       sessionStorage.setItem('token', '');
     },
+    setUser(state, user) {
+      state.user = user;
+      sessionStorage.setItem('user', JSON.stringify(user));
+    }
   },
   actions: {
   },
