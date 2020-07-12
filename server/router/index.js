@@ -6,10 +6,13 @@ var vertoken = require('./../token/token_vertify');
 const router = express.Router();
 expressWs(router);
 
+var _ = require('lodash');
+
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/mychat";
 const MongoClientURL = "mongodb://127.0.0.1:27017", dbName = "mychat";
 
+let currentUser;
 
 // create application/json parser
 var jsonParser = bodyParser.json()
@@ -37,12 +40,15 @@ router.get('/getList', async (req, res) => {
   } catch (e) {
     console.log(e.stack);
   } finally {
-    res.send(userList);
+    res.send(_.sortBy(userList, (item) => item.isOnline));
   }
 })
 
 
-router.post('/login', jsonParser, async (req, res) => {
+
+
+router.post('/getChatRecord', jsonParser, async (req, res) => {
+  let userList = []
   try {
     const client = await MongoClient.connect(MongoClientURL, {
       useNewUrlParser: true,
@@ -50,23 +56,56 @@ router.post('/login', jsonParser, async (req, res) => {
     });
     const db = await client.db(dbName);
     // execute find query
-    userList = await db.collection('user').find(req.body).toArray();
+    list = await (await db.collection('chatRecord').find(req.body).toArray());
     client.close();
   } catch (e) {
     console.log(e.stack);
   } finally {
-    if (userList) {
-      let token = await vertoken.setToken(userList[0]['name'], userList[0]['_id'])
-      res.cookie('token', token, { httpOnly: true });
-      res.json({
-        code: 0,
-        msg: '登录成功',
-        token: token,
-        data: userList[0],
-        success: userList.length ? true : false
-      })
-    }
+    res.send(list);
   }
+})
+
+
+
+
+
+router.post('/login', jsonParser, (req, res) => {
+  MongoClient.connect(MongoClientURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }, (err, db) => {
+    if (err) throw err;
+    let dbo = db.db("mychat");
+    dbo.collection('user').find(req.body).toArray((err, userList) => {
+      if (userList[0]) {
+        currentUser = userList[0];
+        let updateStr = { $set: { "isOnline": true } };
+        dbo.collection("user").updateOne(req.body, updateStr, (err, res) => {
+          if (err) throw err;
+          console.log("更新用户在线状态成功");
+          db.close();
+        });
+        let token = vertoken.setToken(userList[0]['name'], userList[0]['_id'])
+        res.cookie('token', token, { httpOnly: true });
+        res.json({
+          code: 200,
+          msg: '登录成功',
+          token: token,
+          data: userList[0],
+          success: userList.length ? true : false
+        })
+      } else {
+        res.json({
+          code: 500,
+          msg: '登录後端失敗',
+          token: 'token',
+          data: userList,
+          success: userList.length ? true : false
+        })
+      }
+    });
+
+  });
 })
 
 

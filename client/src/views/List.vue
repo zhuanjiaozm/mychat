@@ -9,11 +9,11 @@
 
     <div class="list">
       <van-swipe-cell v-for="item in list" :key="item._id">
-        <div class="li" @click="toChat(item)">
+        <div class="li" @click="toChat(item)" :class="[Boolean(item.isOnline) ? 'isOnline' : 'isOffline' ]">
           <div class="avator">
             <img :src="item.circleUrl" />
           </div>
-          <div class="center">{{item.name}}【{{item._id}}】</div>
+          <div class="center">{{item.name}}【{{item.tel}}】</div>
 
           <div class="right">
             <van-icon name="chat-o" badge="9" />
@@ -28,6 +28,12 @@
 </template>
 
 <style lang="scss">
+.isOnline {
+  color: black;
+}
+.isOffline {
+  color: gray;
+}
 .container {
   display: flex;
   flex-direction: column; /*横向*/
@@ -86,7 +92,7 @@ export default {
     addUser() {},
 
     toChat(user) {
-      this.$router.push({ path: `/chat/${user['_id']}` });
+      this.$router.push({ path: `/chat/${user["_id"]}` });
       sessionStorage.setItem("receiver", JSON.stringify(user));
     },
 

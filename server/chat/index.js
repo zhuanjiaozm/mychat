@@ -9,6 +9,8 @@ var moment = require('moment');
 require('moment/locale/zh-cn')
 moment.locale('zh-cn')
 
+var MongoClient = require('mongodb').MongoClient;
+const MongoClientURL = "mongodb://127.0.0.1:27017", dbName = "mychat";
 
 expressWs(router);
 
@@ -17,6 +19,25 @@ const allClients = {}
 let receiveCmd = (msg) => {
   console.log('收到了客户端的消息:', JSON.stringify(msg));
 }
+
+let addRecord = (msgInfo) => {
+  MongoClient.connect(MongoClientURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }, (err, db) => {
+    if (err) throw err;
+    let dbo = db.db(dbName);
+    dbo.collection('chatRecord').insertMany([msgInfo], (err, res) => {
+      if (err) throw err;
+      console.log("插入的文档数量为: " + res.insertedCount);
+      db.close();
+    });
+  });
+}
+
+
+
+
 let sendMsg = (ws, msg) => {
   ws.send(JSON.stringify({
     msg: msg,
@@ -33,15 +54,26 @@ let closeClient = (item) => {
 }
 
 router.ws('/chat/:userID/:receiveID', function (ws, req) {
-  console.log('req.params.userID:', req.params.userID)
-  console.log('req.params.receiveID:', req.params.receiveID)
+  // console.log('req.params.userID:', req.params.userID)
+  // console.log('req.params.receiveID:', req.params.receiveID)
   let userID = req.params.userID;
   let receiveID = req.params.receiveID;
+
+
+
 
 
   allClients[req.params.userID] = ws;
 
   ws.on('message', function (msg) {
+    addRecord({
+      userID,
+      receiveID,
+      msg,
+      time: moment().calendar(),
+    })
+
+
     for (const key in allClients) {
       if ((allClients.hasOwnProperty(key)) && (key === receiveID)) {
         sendMsg(allClients[key], msg)
