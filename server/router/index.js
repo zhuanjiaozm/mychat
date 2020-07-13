@@ -48,7 +48,7 @@ router.get('/getList', async (req, res) => {
 
 
 router.post('/getChatRecord', jsonParser, async (req, res) => {
-  let userList = []
+  let userList = [];
   try {
     const client = await MongoClient.connect(MongoClientURL, {
       useNewUrlParser: true,
@@ -56,7 +56,14 @@ router.post('/getChatRecord', jsonParser, async (req, res) => {
     });
     const db = await client.db(dbName);
     // execute find query
-    list = await (await db.collection('chatRecord').find(req.body).toArray());
+    list = await (await db.collection('chatRecord').find({
+      $or: [ //多条件，数组
+        { userID: req.body.userID },
+        { userID: req.body.receiveID },
+        { receiveID: req.body.receiveID },
+        { receiveID: req.body.userID },
+      ]
+    }).toArray());
     client.close();
   } catch (e) {
     console.log(e.stack);
@@ -105,6 +112,33 @@ router.post('/login', jsonParser, (req, res) => {
       }
     });
 
+  });
+})
+
+
+
+router.post('/logout', jsonParser, (req, response) => {
+  MongoClient.connect(MongoClientURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }, (err, db) => {
+    if (err) throw err;
+    let dbo = db.db("mychat");
+    let updateStr = { $set: { "isOnline": false } };
+    dbo.collection("user").updateOne({
+      name: req.body.name
+    }, updateStr, (err, res) => {
+      if (err) throw err;
+      console.log(res.result.nModified + "个用户下线成功");
+      db.close();
+      response.json({
+        code: 200,
+        msg: '用户下线成功',
+        token: '',
+        data: {},
+        success: true
+      })
+    });
   });
 })
 

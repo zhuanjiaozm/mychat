@@ -29,7 +29,7 @@ let addRecord = (msgInfo) => {
     let dbo = db.db(dbName);
     dbo.collection('chatRecord').insertMany([msgInfo], (err, res) => {
       if (err) throw err;
-      console.log("插入的文档数量为: " + res.insertedCount);
+      // console.log("插入的文档数量为: " + res.insertedCount);
       db.close();
     });
   });
@@ -46,9 +46,9 @@ let sendMsg = (ws, msg) => {
   }));
 }
 let closeClient = (item) => {
-  for (var index = 0; index < clients.length; index++) {
-    if (clients[index] == item) {
-      clients.splice(index, 1)
+  for (const key in allClients) {
+    if ((allClients.hasOwnProperty(key))) {
+
     }
   }
 }
@@ -70,7 +70,7 @@ router.ws('/chat/:userID/:receiveID', function (ws, req) {
       userID,
       receiveID,
       msg,
-      time: moment().calendar(),
+      time: moment().format('YYYY/MM/DD HH:mm:ss'),
     })
 
 
@@ -81,9 +81,9 @@ router.ws('/chat/:userID/:receiveID', function (ws, req) {
     }
   })
 
-  ws.on("close", function (msg) {
+  ws.on("close", function () {
     console.log("服务端连接已经关闭了");
-    closeClient(this)
+    // closeClient(this)
   });
 })
 

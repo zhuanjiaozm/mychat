@@ -3,21 +3,33 @@
     <van-nav-bar :title="receiver.name" left-text left-arrow @click-left="onClickLeft" />
 
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
-      <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
-        <van-cell v-for="item in list" :key="item.msg" class="msg">
-          <div>{{item.msg}}</div>
-          <div>{{item.time}}</div>
+      <van-list v-model="loading" :finished="finished" @load="onLoad" id="list">
+        <van-cell
+          v-for="item in list"
+          :key="item.msg"
+          class="msg"
+          :class="[Boolean(item.userID == user['_id']) ?  'text-right':'text-left' ]"
+        >
+          <div>{{ item.msg }}</div>
+          <div>{{ item.time }}</div>
         </van-cell>
       </van-list>
     </van-pull-refresh>
 
-    <van-field v-model="msg" center clearable label="消息" placeholder="请输入你要发的信息">
+    <van-field
+      v-model="msg"
+      center
+      clearable
+      label="消息"
+      placeholder="请输入你要发的信息"
+      v-on:keyup.enter="keyUp($event)"
+    >
       <template #button>
         <van-button
           size="small"
           type="primary"
-          @click="websocketsend"
           :disabled="!Boolean(msg.length)"
+          @click="websocketsend"
         >发送</van-button>
       </template>
     </van-field>
@@ -37,20 +49,32 @@ export default {
       list: [],
       finished: true,
       loading: false,
-      msg: "一起去爬山吗？"
+      msg: ""
     };
   },
   mounted() {
     // 初始化
     this.initWebSocket();
     this.getList();
-    console.log("this.$store.state.user", this.$store.state.user);
+  },
+  destroyed() {
+    // 销毁监听
+    this.websock.onclose = this.close;
   },
   methods: {
     //顶部下拉刷新
     onRefresh() {
       this.list = [];
       this.getList();
+    },
+
+    // 监听回车发送消息
+    keyUp(ev) {
+      if (ev.keyCode === 13) {
+        this.websocketsend();
+        this.scrollBottom();
+        this.msg = "";
+      }
     },
 
     // 返回上一页
@@ -69,6 +93,7 @@ export default {
         .then(response => {
           this.list = response;
           this.isLoading = false;
+          this.scrollBottom();
         });
     },
 
@@ -85,8 +110,8 @@ export default {
     },
     websocketonopen() {
       //连接建立之后执行send方法发送数据
-      console.log("连接建立之后执行send方法发送数据");
-      this.websocketsend("连接建立之后执行send方法发送数据");
+      // console.log("连接建立之后执行send方法发送数据");
+      // this.websocketsend("连接建立之后执行send方法发送数据");
     },
     websocketonerror() {
       //连接建立失败重连
@@ -95,22 +120,33 @@ export default {
     websocketonmessage(e) {
       //数据接收
       const redata = JSON.parse(e.data);
-      console.log(redata);
       this.list.push(redata);
+      this.scrollBottom();
     },
     websocketsend() {
       //数据发送
-      this.websock.send(this.msg);
-      this.msg = "";
+      if (this.msg) {
+        this.websock.send(this.msg);
+        this.list.push({
+          msg: this.msg,
+          receiveID: this.receiver["_id"],
+          time: this.$moment().format("YYYY/MM/DD HH:mm:ss"),
+          userID: this.user["_id"]
+        });
+        this.msg = "";
+        this.scrollBottom();
+      }
     },
     websocketclose() {
       //关闭
       console.log("断开连接:", this.user["_id"]);
+    },
+    scrollBottom() {
+      setTimeout(() => {
+        let list = document.getElementById("list"); // 获取对象
+        list.scrollTop = list.scrollHeight; // 滚动高度
+      }, 100);
     }
-  },
-  destroyed() {
-    // 销毁监听
-    this.websock.onclose = this.close;
   }
 };
 </script>
@@ -118,5 +154,14 @@ export default {
 <style>
 .van-cell .msg {
   padding: 0;
+}
+
+.text-right > .van-cell__value {
+  text-align: right;
+  color: gray;
+}
+.van-list {
+  overflow-y: scroll;
+  height: 77vh;
 }
 </style>

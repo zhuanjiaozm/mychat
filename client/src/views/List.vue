@@ -9,7 +9,11 @@
 
     <div class="list">
       <van-swipe-cell v-for="item in list" :key="item._id">
-        <div class="li" @click="toChat(item)" :class="[Boolean(item.isOnline) ? 'isOnline' : 'isOffline' ]">
+        <div
+          class="li"
+          @click="toChat(item)"
+          :class="[Boolean(item.isOnline) ? 'isOnline' : 'isOffline' ]"
+        >
           <div class="avator">
             <img :src="item.circleUrl" />
           </div>
@@ -34,6 +38,7 @@
 .isOffline {
   color: gray;
 }
+
 .container {
   display: flex;
   flex-direction: column; /*横向*/
