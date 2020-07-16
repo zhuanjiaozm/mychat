@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --mode production",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -39,6 +39,8 @@
     "postcss-pxtorem": "^5.1.1",
     "sass-loader": "^8.0.2",
     "sass-resources-loader": "^2.0.3",
+    "silent": "^0.1.2",
+    "vue-cli-plugin-cordova": "^2.4.1",
     "vue-template-compiler": "^2.6.11"
   },
   "gitHooks": {

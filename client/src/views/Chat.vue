@@ -10,12 +10,15 @@
           class="msg"
           :class="[Boolean(item.userID == user['_id']) ?  'text-right':'text-left' ]"
         >
-          <div>{{ item.msg }}</div>
-          <div>{{ item.time }}</div>
+          <div class="text">
+            {{ item.msg }}
+            <i>({{ item.time }})</i>
+          </div>
+          <div></div>
         </van-cell>
       </van-list>
     </van-pull-refresh>
-
+    <audio src="/static/medea/message.mp3" id="audio" autoplay></audio>
     <van-field
       v-model="msg"
       center
@@ -23,6 +26,7 @@
       label="消息"
       placeholder="请输入你要发的信息"
       v-on:keyup.enter="keyUp($event)"
+      autofocus="true"
     >
       <template #button>
         <van-button
@@ -159,6 +163,22 @@ export default {
 .text-right > .van-cell__value {
   text-align: right;
   color: gray;
+}
+
+.text-left .text {
+  background-color: lightgreen;
+  /* width: 80%; */
+  border-radius: 7px;
+  padding: 0 5px;
+  float: left;
+}
+.text-right .text {
+  background-color: gray;
+  /* width: 80%; */
+  border-radius: 7px;
+  padding: 0 5px;
+  float: right;
+  color: white;
 }
 .van-list {
   overflow-y: scroll;

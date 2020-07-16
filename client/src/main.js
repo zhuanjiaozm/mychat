@@ -6,7 +6,7 @@ import router from './router';
 import store from './store';
 import * as http from './http/http';
 import moment from 'moment'
-
+console.log(process.env.baseApi);
 Vue.use(Vant);
 
 Vue.config.productionTip = false;

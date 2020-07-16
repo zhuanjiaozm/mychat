@@ -6,7 +6,15 @@ function resolve(dir) {
   return path.join(__dirname, dir);// path.join(__dirname)设置绝对路径
 }
 module.exports = {
-  lintOnSave: true,
+  //输出文件夹，我这里设为www,主要是和Cordova配合生成安卓应用的。
+  outputDir: 'www',
+
+  //不生成map
+  productionSourceMap: false,
+
+  // 包含运行时编译器的 Vue 构建版本
+  runtimeCompiler: true,
+
   chainWebpack: (config) => {
     // 添加别名
     config.resolve.alias
@@ -16,6 +24,7 @@ module.exports = {
       .set('views', resolve('src/views'))
       .set('components', resolve('src/components'));
   },
+
   devServer: {
     port: 8888, // 端口
     proxy: {
@@ -29,17 +38,16 @@ module.exports = {
       },
     },
   },
+
   css: {
-    extract: IS_PROD,
-    sourceMap: false,
+    extract: false,
     loaderOptions: {
       scss: {
-        // 注入 `sass` 的 `mixin` `variables` 到全局, $cdn可以配置图片cdn
-        // 详情: https://cli.vuejs.org/guide/css.html#passing-options-to-pre-processor-loaders
-        prependData: `
-          @import "assets/css/var.scss";
-          `,
-      },
-    },
+        prependData: '\n          @import "assets/css/var.scss";\n          '
+      }
+    }
   },
+
+  publicPath: './',
+  assetsDir: 'static'
 };

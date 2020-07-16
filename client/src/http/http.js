@@ -12,7 +12,7 @@ axios.interceptors.request.use((config) => {
   // config.data = JSON.stringify(config.data);
   config.headers = {
     'Content-Type': 'application/json',
-    'Connection':'keep-alive',
+    'Connection': 'keep-alive',
     token: store.state.token,
   };
   NProgress.start();
@@ -20,6 +20,10 @@ axios.interceptors.request.use((config) => {
 }, (error) => {
   Promise.reject(error);
 });
+
+if (process.env.NODE_ENV === 'production') {
+  axios.defaults.baseURL = 'http://home.fengziqiao.xyz:8802/auth/'; // 本地环境
+}
 
 // 响应拦截器即异常处理
 axios.interceptors.response.use((response) => {
